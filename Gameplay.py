@@ -19,7 +19,7 @@ def salji_2(igrac1, igrac2, podatak, prefiks = ''):
 def igraj(mat, prvi, drugi, brP):
     salji_2(prvi, drugi, '', '%cls')
     salji_2(prvi, drugi, mat, '%mat')
-    sleep(1) # Da ne bi spojio podatak koji sadrzi matricu i obavestenje o tome ko je na potezu
+    sleep(0.1) # Da ne bi spojio podatak koji sadrzi matricu i obavestenje o tome ko je na potezu
 
     if(brP % 2 == 0):
         salji_1(prvi, prvi.name + ' je na potezu: ', '%prv')
@@ -37,7 +37,7 @@ def zavrsi(mat, endSignal, prvi, drugi):
     salji_2(prvi, drugi, '', '%cls')
     salji_2(prvi, drugi, mat, '%mat')
 
-    sleep(1)
+    sleep(0.1)
 
     if (endSignal == 0):
         salji_2(prvi, drugi, '\n>> Igra je zavrsena NERESENO! Hvala na igri!', '%end')
@@ -91,23 +91,7 @@ def daLiJeKraj(mat, brP, prvi, drugi):
 # ========================
 def main(igrac1, igrac2):
     mat = [[' ' for j in range(7)] for i in range(6)]
- #   prviIgrac = igrac1.name
- #   drugiIgrac = igrac2.name
     brojPoteza = 0;
-
-
-
-    #
-#    igrac1.clientSocket.send((
-#        '\n>>' + prviIgrac + ' ima oznaku "X", a ' + drugiIgrac + ' "O".\n==>Pritisnite bilo sta za START').encode())
- #   igrac1.clientSocket.recv(4096)
-#
- #   igrac2.clientSocket.send((
-  #      '\n>>' + prviIgrac + ' ima oznaku "X", a ' + drugiIgrac + ' "O".\n==>Pritisnite bilo sta za START').encode())
-   # igrac2.clientSocket.recv(4096)
-    #
-
- #   salji(igrac1, igrac2, 'cls')  # !!!!!!!!!
 
     while(daLiJeKraj(mat, brojPoteza, igrac1, igrac2) != True):
         mat = igraj(mat, igrac1, igrac2, brojPoteza)

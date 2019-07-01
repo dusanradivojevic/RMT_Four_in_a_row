@@ -1,31 +1,45 @@
 from socket import *
 import ClientClass, Gameplay
+from threading import *
 
+#===========================================
+class ClientHandler(Thread):
+    def __init__(self, cl1, cl2):
+        super().__init__()
+
+        self.client1 = cl1
+        self.client2 = cl2
+
+        self.start()
+
+    def run(self):
+        self.setUpGame(self.client1, self.client2)
+
+    def enterName(self, clientSocket):
+        clientSocket.send('\n===========\n'.encode())
+        clientSocket.send('>> Unesite korisnicko ime:'.encode())
+        name = clientSocket.recv(4096).decode()
+        clientSocket.send(('>> Vase korisnicko ime je ' + name).encode())
+
+        return name
+
+    def beginGame(self, client1, client2):
+        print('>> Igra je uspesno pokrenuta!')
+        Gameplay.main(client1, client2)
+        client1.clientSocket.close()
+        client2.clientSocket.close()
+
+    def setUpGame(self, client1, client2):
+        client1.name = self.enterName(client1.clientSocket)
+        client2.name = self.enterName(client2.clientSocket)
+
+        client1.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client2.name + '. \n>>Vi ste prvi igrac, srecno!').encode())
+        client2.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client1.name + '. \n>>Vi ste drugi igrac, srecno!').encode())
+
+        self.beginGame(client1, client2)
 #===========================================
 def greetings(clientSocket):
     clientSocket.send('>> Dobrodosli! Igra ce uskoro poceti.'.encode())
-
-def beginGame(client1, client2):
-    Gameplay.main(client1, client2)
-    client1.clientSocket.close()
-    client2.clientSocket.close()
-
-def setUpGame(client1, client2):
-    client1.clientSocket.send('\n===========\n'.encode())
-    client1.clientSocket.send('>> Unesite korisnicko ime:'.encode())
-    client1.name = client1.clientSocket.recv(4096).decode()
-    client1.clientSocket.send(('>> Vase korisnicko ime je ' + client1.name).encode())
-
-    client2.clientSocket.send('\n===========\n'.encode())
-    client2.clientSocket.send('>> Unesite korisnicko ime:'.encode())
-    client2.name = client2.clientSocket.recv(4096).decode()
-    client2.clientSocket.send(('>> Vase korisnicko ime je ' + client2.name).encode())
-
-
-    client1.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client2.name + '. \n>>Vi ste prvi igrac, srecno!').encode())
-    client2.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client1.name + '. \n>>Vi ste drugi igrac, srecno!').encode())
-
-    beginGame(client1, client2)
 
 def main_openConnection():
     server_address = 'localhost'
@@ -47,8 +61,7 @@ def main_openConnection():
         client_socket, client_address = server_socket.accept()
 
         greetings(client_socket)
-
-        client = ClientClass.Client('noName',client_socket,client_address)
+        client = ClientClass.Client("noName", client_socket, client_address)
         queueList.append(client)
 
         print(f'>> Igrac je pristigao! U redu cekanja za igru ima ukupno {len(queueList)} igraca.')
@@ -56,10 +69,15 @@ def main_openConnection():
         if(len(queueList) >= 2):
             print('>> Pokrecem igru . . . ')
 
-            setUpGame(queueList[0],queueList[1])
-            queueList.pop(0)
-            queueList.pop(0) # Jer zbog prethodne linije nemamo element sa indeksom 1
-            break #ovo ne treba da stoji kad se ubace niti
+            try:
+            #    th = threading.Thread(target=setUpGame, args=(queueList[0], queueList[1]))
+            #    th.start()
+                ClientHandler(queueList[0], queueList[1])
+                queueList.pop(0)
+                queueList.pop(0)  # Jer zbog prethodne linije nemamo element sa indeksom 1
+            except:
+                print('>> Doslo je do greske prilikom pokretanja igre!')
+
 
 # ===========================================
 
