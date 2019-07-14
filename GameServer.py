@@ -31,15 +31,30 @@ class ClientHandler(Thread):
         client2.clientSocket.close()
 
     def setUpGame(self, client1, client2):
-        client1.name = self.enterName(client1.clientSocket)
-        client2.name = self.enterName(client2.clientSocket)
+        try:
+            client1.name = self.enterName(client1.clientSocket)
+            client2.name = self.enterName(client2.clientSocket)
 
-        client1.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client2.name + '. \n>>Vi ste prvi igrac, srecno!').encode())
-        client2.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client1.name + '. \n>>Vi ste drugi igrac, srecno!').encode())
+            client1.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client2.name +
+                                       '. \n>> Vi ste prvi igrac, srecno! \n>> Za izlazak u bilo kom trenutku unesite !q').encode())
+            client2.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client1.name +
+                                       '. \n>> Vi ste drugi igrac, srecno! \n>> Za izlazak u bilo kom trenutku unesite !q').encode())
 
-        sleep(3)  # Da bi stigli da procitaju info
+            sleep(3)  # Da bi stigli da procitaju info
 
-        self.beginGame(client1, client2)
+            self.beginGame(client1, client2)
+        except:
+            print("\n >> Doslo je do problema sa konekcijom!")
+            try:
+                client1.clientSocket.send(('\n>> Protivnik je napustio igru!').encode())
+            except:
+                print()
+
+            try:
+                client2.clientSocket.send(('\n>> Protivnik je napustio igru!').encode())
+            except:
+                print()
+
 #===========================================
 def greetings(clientSocket):
     clientSocket.send('>> Dobrodosli! Igra ce uskoro poceti.'.encode())

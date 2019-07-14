@@ -33,6 +33,9 @@ def unesiKolonu():
     while True:
         kol = input()
 
+        if(kol == '!q'):
+            return kol
+
         if(len(kol) > 1):
             print('>> Uneli ste pogresnu vrednost, probajte ponovo!')
             continue
@@ -47,6 +50,10 @@ def unesiKolonu():
 def odigraj(mat):
     while True:
         kolona = unesiKolonu()
+
+        if(kolona == '!q'):
+            return kolona
+
         izbor = ord(kolona)  # ascii predstava unetog slova
 
         if (punaKolona(mat, izbor - 65) == False):
@@ -66,6 +73,12 @@ def igraj(client_socket):
             s = json.loads(s)
             prefiks = s.get("prefiks")
             podatak = s.get("podatak")
+
+            if(prefiks == '%err'):
+                os.system('cls')
+                print(podatak)
+                sleep(3)
+                break
 
             if(prefiks == '%cls'):
                 os.system('cls')
@@ -92,9 +105,9 @@ def igraj(client_socket):
                 print(podatak)
 
     except Exception as e:
-        print('\n\n Greska na kraju igraj metode')
-        print(str(e))
-        sleep(40)
+        print('>> Doslo je do prekida rada servera. ')
+        sleep(5)
+
 # ========================
 def unesiIme():
     while True:
@@ -125,18 +138,26 @@ def main_ConnectTo():
         brojPokusaja += 1
 
     while True and brojPokusaja < 3:
-        str = client_socket.recv(4096).decode()
-        print(str)
-        if(str == '>> Unesite korisnicko ime:'):
-            ime = unesiIme()
-            client_socket.send(ime.encode())
-        if('srecno' in str):
-            igraj(client_socket)
+        try:
+            str = client_socket.recv(4096).decode()
+            print(str)
+            if(str == '>> Unesite korisnicko ime:'):
+                ime = unesiIme()
+                client_socket.send(ime.encode())
+            if('srecno' in str):
+                igraj(client_socket)
+                break
+            if('\n>> Protivnik je napustio igru!' == str):
+                break
+        except:
+            print('>> Doslo je do prekida rada servera. ')
             break
 
     print('>> Prekidam konekciju . . .')
+    sleep(5)
     client_socket.close()
     print('>> Konekcija je uspesno prekinuta.')
+    sleep(1)
 
 # ========================
 
