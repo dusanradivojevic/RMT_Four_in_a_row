@@ -23,48 +23,40 @@ def prikazi_polje(mat):
 
 # ========================
 def punaKolona(mat, izbor):
-    izbor -= 65
     if (mat[0][izbor] != ' '):
         return True
     else:
         return False
 
 # ========================
-def unesiIzbor(mat, redni_br_igraca, kolona):
-    kolona = kolona - 65
-    for i in range(6):
-        if(i < 5 and mat[i + 1][kolona] == ' '):
-            continue
-        else:
-            if (redni_br_igraca == 0):
-                mat[i][kolona] = 'X'
-            else:
-                mat[i][kolona] = 'O'
-
-# ========================
 def unesiKolonu():
     while True:
         kol = input()
+
+        if(len(kol) > 1):
+            print('>> Uneli ste pogresnu vrednost, probajte ponovo!')
+            continue
+
         kol = kol.upper()
 
         if(kol == 'A' or kol == 'B' or kol == 'C' or kol == 'D' or kol == 'E' or kol == 'F' or kol == 'G'):
             return kol
         else:
             print('>> Uneli ste pogresnu vrednost, probajte ponovo!')
-
-def odigraj(mat, brIgraca):
+# ========================
+def odigraj(mat):
     while True:
         kolona = unesiKolonu()
-        try:
-            izbor = ord(kolona)  # ascii predstava unetog slova
+        izbor = ord(kolona)  # ascii predstava unetog slova
 
-            if (punaKolona(mat, izbor) == False):
-                break
-        except:
-            print('>> Kolona je puna, probajte ponovo!')
+        if (punaKolona(mat, izbor - 65) == False):
+            break
 
-    unesiIzbor(mat, brIgraca, izbor)
-    return json.dumps({"b": mat})
+        print('>> Kolona je puna, probajte ponovo!')
+
+#    unesiIzbor(mat, brIgraca, izbor - 65)
+#    return json.dumps({"b": mat})
+    return str(izbor - 65)
 # ========================
 def igraj(client_socket):
     try:
@@ -83,21 +75,22 @@ def igraj(client_socket):
                 # Prijem matrice
                 matGl = podatak
                 prikazi_polje(matGl)
+
             elif(prefiks == '%prv'):
                 print(podatak)
-                try:
-                    client_socket.send(odigraj(matGl,0).encode()) # 0 - prvi igrac na potezu
-                except Exception as e:
-                    print('\n\n Greska %prv send')
-                    print(str(e))
+                client_socket.send(odigraj(matGl).encode())
+
             elif(prefiks == '%dru'):
                 print(podatak)
-                client_socket.send(odigraj(matGl,1).encode()) # 1 - drugi igrac na potezu
+                client_socket.send(odigraj(matGl).encode())
+
             elif(prefiks == '%end'):
                 print(podatak)
+                sleep(3)  # Da bi stigli da procitaju info
                 break
             else:
                 print(podatak)
+
     except Exception as e:
         print('\n\n Greska na kraju igraj metode')
         print(str(e))
@@ -138,11 +131,7 @@ def main_ConnectTo():
             ime = unesiIme()
             client_socket.send(ime.encode())
         if('srecno' in str):
-            try:
-                igraj(client_socket)
-            except Exception as e:
-                print('greska kod igraj')
-                print(str(e))
+            igraj(client_socket)
             break
 
     print('>> Prekidam konekciju . . .')

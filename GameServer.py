@@ -1,6 +1,7 @@
 from socket import *
 import ClientClass, Gameplay
 from threading import *
+from time import sleep
 
 #===========================================
 class ClientHandler(Thread):
@@ -35,6 +36,8 @@ class ClientHandler(Thread):
 
         client1.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client2.name + '. \n>>Vi ste prvi igrac, srecno!').encode())
         client2.clientSocket.send(('\n===========\n\n>> Vas protivnik je: ' + client1.name + '. \n>>Vi ste drugi igrac, srecno!').encode())
+
+        sleep(3)  # Da bi stigli da procitaju info
 
         self.beginGame(client1, client2)
 #===========================================
