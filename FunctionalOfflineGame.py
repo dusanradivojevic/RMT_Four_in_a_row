@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 # ========================
 def padanje(mat, redni_br_igraca, kolona):
@@ -53,20 +53,25 @@ def igraj(mat, prvi, drugi, brP):
     prikazi_polje(mat)
 
     if(brP % 2 == 0):
-        print(f'{prvi} je na potezu: ')
+        print(f'>> {prvi} je na potezu: ')
     else:
-        print(f'{drugi} je na potezu: ')
+        print(f'>> {drugi} je na potezu: ')
 
 
     while(True):
         kolona = input()
+
+        if (kolona == '!q'):
+            print('\n>> Igra je prekinuta komandom !q.')
+            sys.exit(0)
+
         try:
             izbor = ord(kolona.upper()) #ascii predstava unetog slova
 
             if (izbor >= 65 and izbor < 72 and punaKolona(mat, izbor) == False):
                 break
         except:
-            print('Uneli ste pogresnu vrednost, probajte ponovo!')
+            print('>> Uneli ste pogresnu vrednost, probajte ponovo!')
 
     padanje(mat, brP % 2, izbor-65)
 # ========================
@@ -75,9 +80,9 @@ def zavrsi(mat, endSignal, igrac = 'nebitno'):
     prikazi_polje(mat)
 
     if (endSignal == 0):
-        print("Igra je zavrsena NERESENO!")
+        print(">> Igra je zavrsena NERESENO!")
     else:
-        print(f'Pobednik je {igrac}!')
+        print(f'>> Pobednik je {igrac}!')
 # ========================
 def proveri(mat, znak):
     for i in range(6):
@@ -106,10 +111,10 @@ def proveri(mat, znak):
     return False
 # ========================
 def daLiJeKraj(mat, brP, prvi, drugi):
-    if (brP == 42):
+    if (brP >= 42):
         zavrsi(mat, 0)
     elif (brP % 2 != 0 and proveri(mat, 'X') == True):
-        zavrsi(mat,1, prvi)
+        zavrsi(mat, 1, prvi)
     elif (proveri(mat, 'O') == True):
         zavrsi(mat, 2, drugi)
     else:
@@ -120,18 +125,19 @@ def daLiJeKraj(mat, brP, prvi, drugi):
 # ========================
 def main():
     mat = [[' ' for j in range(7)] for i in range(6)]
-    prviIgrac = input('\nIme prvog igraca: ')
-    drugiIgrac = input('\nIme drugog igraca: ')
+    prviIgrac = input('\n>> Ime prvog igraca: ')
+    drugiIgrac = input('\n>> Ime drugog igraca: ')
     brojPoteza = 0;
 
-    print(f'\n{prviIgrac} ima oznaku "X", a {drugiIgrac} oznaku "O".\n==>Pritisnite bilo sta za START')
+    print(f'\n>> {prviIgrac} ima oznaku "X", a {drugiIgrac} oznaku "O".\n>> Igru mozete prekinuti u bilo kom trenutku '
+          f'komandom !q.\n>> Pritisnite bilo sta za START')
     os.system('pause')
 
     while(daLiJeKraj(mat, brojPoteza, prviIgrac, drugiIgrac) != True):
         igraj(mat, prviIgrac, drugiIgrac, brojPoteza)
         brojPoteza += 1
 
-    input("\n\nPRITISNI BILO STA ZA KRAJ\n")
+    input("\n\n>>Pritisnite bilo sta za KRAJ\n")
     os.system('pause')
 # ==========================
 
