@@ -21,3 +21,5 @@ Firstly, server needs to be up and running. Within project directory type: `pyth
 In this version both players play the game in the same console. For starting type: `python FunctionalOfflineGame.py`
 
 ### Enjoy!
+
+![](gif/four-in-a-row.gif)
